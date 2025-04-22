@@ -4,44 +4,48 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.smarttripapp.usr21903207.ui.theme.SmartTripAppTheme
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.smarttripapp.usr21903207.ui.screen.AppDestinations // Import destinations
+import com.smarttripapp.usr21903207.ui.screen.LocationDetailsScreen // Assuming you have this
+import com.smarttripapp.usr21903207.ui.screen.MenuScreen
+import com.smarttripapp.usr21903207.ui.theme.AppTheme // Use your actual theme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        enableEdgeToEdge() // Keep edge-to-edge if desired
+
         setContent {
-            SmartTripAppTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+            AppTheme {
+                AppNavigation()
             }
         }
     }
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+fun AppNavigation() {
+    val navController = rememberNavController()
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    SmartTripAppTheme {
-        Greeting("Android")
+    NavHost(navController = navController, startDestination = AppDestinations.MENU_SCREEN) {
+        // Define the Menu screen
+        composable(AppDestinations.MENU_SCREEN) {
+            MenuScreen(navController = navController)
+        }
+        composable(AppDestinations.ADD_POI_SCREEN) {
+            androidx.compose.material3.Text("Ajouter POI")
+        }
+        composable(AppDestinations.MAP_SCREEN) {
+            androidx.compose.material3.Text("Carte SDK")
+        }
+        composable(AppDestinations.CURRENT_LOCATION_SCREEN) {
+            androidx.compose.material3.Text("Position Actuelle")
+        }
+        composable(AppDestinations.TRIP_RECAP_SCREEN) {
+            androidx.compose.material3.Text("Retracer Voyage")
+        }
     }
 }
