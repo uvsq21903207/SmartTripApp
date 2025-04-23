@@ -9,14 +9,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.smarttripapp.usr21903207.ui.screen.AppDestinations // Import destinations
-import com.smarttripapp.usr21903207.ui.screen.LocationDetailsScreen // Assuming you have this
 import com.smarttripapp.usr21903207.ui.screen.MenuScreen
 import com.smarttripapp.usr21903207.ui.theme.AppTheme // Use your actual theme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge() // Keep edge-to-edge if desired
+        enableEdgeToEdge()
 
         setContent {
             AppTheme {
