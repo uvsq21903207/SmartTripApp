@@ -36,32 +36,6 @@ object AppDestinations {
 }
 
 @Composable
-fun AppNavigation() {
-    val navController = rememberNavController()
-
-    NavHost(navController = navController, startDestination = AppDestinations.MENU_SCREEN) {
-        composable(AppDestinations.MENU_SCREEN) {
-            MenuScreen(navController = navController)
-        }
-        composable(AppDestinations.ADD_POI_SCREEN) {
-            // Implement this screen later
-            Text("Ajouter POI")
-        }
-        composable(AppDestinations.MAP_SCREEN) {
-            // Implement this screen later
-            Text("Carte SDK")
-        }
-        composable(AppDestinations.CURRENT_LOCATION_SCREEN) {
-            CurrentLocationScreen(navController = navController)
-        }
-        composable(AppDestinations.TRIP_RECAP_SCREEN) {
-            // Implement this screen later
-            Text("Retracer Voyage")
-        }
-    }
-}
-
-@Composable
 fun MenuScreen(navController: NavController, modifier: Modifier = Modifier) {
     val context = LocalContext.current // Obtenir le contexte
     // Liste des permissions requises (ajustée pour SDK 35)

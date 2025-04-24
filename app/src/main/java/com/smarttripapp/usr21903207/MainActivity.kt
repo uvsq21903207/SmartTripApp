@@ -9,7 +9,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.smarttripapp.usr21903207.ui.screen.AppDestinations // Import destinations
+import com.smarttripapp.usr21903207.ui.screen.CurrentLocationScreen
 import com.smarttripapp.usr21903207.ui.screen.MenuScreen
+import com.smarttripapp.usr21903207.ui.screen.MapScreen
 import com.smarttripapp.usr21903207.ui.theme.AppTheme // Use your actual theme
 
 class MainActivity : ComponentActivity() {
@@ -38,10 +40,10 @@ fun AppNavigation() {
             androidx.compose.material3.Text("Ajouter POI")
         }
         composable(AppDestinations.MAP_SCREEN) {
-            androidx.compose.material3.Text("Carte SDK")
+            MapScreen(navController = navController)
         }
         composable(AppDestinations.CURRENT_LOCATION_SCREEN) {
-            androidx.compose.material3.Text("Position Actuelle")
+            CurrentLocationScreen(navController = navController)
         }
         composable(AppDestinations.TRIP_RECAP_SCREEN) {
             androidx.compose.material3.Text("Retracer Voyage")
