@@ -63,7 +63,7 @@ class LocationService : Service() {
 
     // Arrêt du service et annulation des coroutines
     override fun onDestroy() {
-        super.onDestroy()
+        super.onDestroy() // Appel de la méthode de la classe parente
         serviceScope.cancel() // Annule toutes les coroutines lors de la destruction lancées dans ce scope
         Log.d("LocationService", "Service détruit")
     }
@@ -106,10 +106,10 @@ class LocationService : Service() {
             }
             .onEach { location ->
                 // Traitement de chaque nouvelle localisation reçue
-                val currentTime = timeFormat.format(Date(location.time))
-                val lat = String.format("%.5f", location.latitude) // Formatage pour affichage
-                val lon = String.format("%.5f", location.longitude)
-                val accuracy = String.format("%.1f", location.accuracy)
+                val currentTime = timeFormat.format(Date(location.time)) // Formattage de l'heure
+                val lat = String.format("%.5f", location.latitude) // Format avec 5 décimales coordonnées latitude
+                val lon = String.format("%.5f", location.longitude) // Format avec 5 décimales coordonnées longitude
+                val accuracy = String.format("%.1f", location.accuracy) // Format avec 1 décimale de l'accuracy
                 Log.d("LocationService", "Nouvelle localisation: Lat=${location.latitude}, Lon=${location.longitude}")
 
                 // --- INTÉGRATION BASE DE DONNÉES ---
@@ -139,7 +139,7 @@ class LocationService : Service() {
             }
             .launchIn(serviceScope) // Lance la collecte dans le scope du service
 
-        Log.d("LocationService", "Collecte des mises à jour de localisation lancée.")
+        Log.d("LocationService", "Collecte des mises à jour de localisation lancée.") // Log de confirmation
     }
 
     // Méthode pour arrêter le service de premier plan et le suivi
@@ -156,15 +156,15 @@ class LocationService : Service() {
 
     // Crée le canal de notification (requis à partir d'Android 8.0 Oreo / API 26)
     private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) { // Vérifie la version d'Android
+            val channel = NotificationChannel( // Création du canal
                 NOTIFICATION_CHANNEL_ID,
                 NOTIFICATION_CHANNEL_NAME,
                 NotificationManager.IMPORTANCE_LOW // Importance basse pour moins d'interruptions
             )
             channel.description = "Notifications pour le suivi de localisation SmartTrip"
-            val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            manager.createNotificationChannel(channel)
+            val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager // Récupération du service
+            manager.createNotificationChannel(channel) // Création du canal de notification
             Log.d("LocationService", "Canal de notification créé.")
         }
     }
@@ -173,9 +173,9 @@ class LocationService : Service() {
     private fun getMainActivityPendingIntent() = PendingIntent.getActivity(
         this,
         0, // requestCode
-        Intent(this, MainActivity::class.java).also {
-            it.action = Intent.ACTION_MAIN
-            it.addCategory(Intent.CATEGORY_LAUNCHER)
+        Intent(this, MainActivity::class.java).also { // Ajout d'un Intent pour MainActivity
+            it.action = Intent.ACTION_MAIN // Action principale
+            it.addCategory(Intent.CATEGORY_LAUNCHER) // Ajout de catégories
             // FLAG_ACTIVITY_CLEAR_TOP: Si MainActivity est déjà ouverte, l'amène au premier plan
             // FLAG_ACTIVITY_SINGLE_TOP: Ne recrée pas MainActivity si elle est déjà au sommet de la pile
             it.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
@@ -187,7 +187,7 @@ class LocationService : Service() {
 
 
     // Constantes pour le service
-    companion object {
+    companion object { // Constantes en dehors des méthodes
         const val ACTION_START = "ACTION_START"
         const val ACTION_STOP = "ACTION_STOP"
 
