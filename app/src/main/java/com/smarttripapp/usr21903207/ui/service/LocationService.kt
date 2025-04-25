@@ -17,11 +17,18 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import com.smarttripapp.usr21903207.ui.data.database.AppDatabase // Import de la classe Database
+import com.smarttripapp.usr21903207.ui.data.repository.LocationRepository // Import du Repository
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
-class LocationService: Service() {
+class LocationService : Service() {
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO) // Scope pour les coroutines du service
     private lateinit var locationClient: LocationClient // Client de localisation
+    private lateinit var locationRepository: LocationRepository // Référence au Repository pour accéder à la base de données
+    private val timeFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault()) // Format pour afficher l'heure dans les logs et la notification
 
     // Binder non utilisé pour le moment, mais requis par la classe Service
     override fun onBind(p0: Intent?): IBinder? {
@@ -31,11 +38,16 @@ class LocationService: Service() {
     // Initialisation du client de localisation lors de la création du service
     override fun onCreate() {
         super.onCreate()
-        locationClient = DefaultLocationClient(
+        locationClient = DefaultLocationClient( // Initialisation du client de localisation
             applicationContext,
             LocationServices.getFusedLocationProviderClient(applicationContext)
         )
-        createNotificationChannel() // Créer le canal de notification (requis pour Android O+)
+
+        // Initialisation du Repository en obtenant le DAO depuis l'instance de la base de données
+        val database = AppDatabase.getDatabase(applicationContext)
+        locationRepository = LocationRepository(database.locationDao())
+
+        createNotificationChannel() // Création le canal de notification
         Log.d("LocationService", "Service créé")
     }
 
@@ -46,14 +58,13 @@ class LocationService: Service() {
             ACTION_STOP -> stop()
         }
         // START_STICKY: Si le service est tué par le système, il tentera de le redémarrer
-        // mais l'intent sera null. Gérez ce cas si nécessaire.
         return START_STICKY
     }
 
     // Arrêt du service et annulation des coroutines
     override fun onDestroy() {
         super.onDestroy()
-        serviceScope.cancel() // Annule toutes les coroutines lancées dans ce scope
+        serviceScope.cancel() // Annule toutes les coroutines lors de la destruction lancées dans ce scope
         Log.d("LocationService", "Service détruit")
     }
 
@@ -63,7 +74,7 @@ class LocationService: Service() {
         val notification = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
             .setContentTitle("Suivi SmartTrip")
             .setContentText("Localisation: N/A") // Sera mis à jour
-            .setSmallIcon(R.drawable.ic_launcher_foreground) // Remplacez par votre icône
+            .setSmallIcon(R.drawable.ic_launcher_foreground) // icone à remplacer
             .setOngoing(true) // Notification non supprimable par balayage
             .setContentIntent(getMainActivityPendingIntent()) // Ouvre l'app au clic
             .build()
@@ -91,19 +102,32 @@ class LocationService: Service() {
             .catch { e ->
                 // Gérer les erreurs (permissions, GPS désactivé...)
                 Log.e("LocationService", "Erreur de localisation: ${e.message}")
-                // Vous pourriez vouloir arrêter le service ici ou notifier l'utilisateur
-                // stop() // Optionnel: arrêter le service en cas d'erreur majeure
+                // Notifier l'utilisateur si le service s'est interrompu
             }
             .onEach { location ->
                 // Traitement de chaque nouvelle localisation reçue
-                val lat = location.latitude.toString().takeLast(3) // Exemple simple
-                val long = location.longitude.toString().takeLast(3)
+                val currentTime = timeFormat.format(Date(location.time))
+                val lat = String.format("%.5f", location.latitude) // Formatage pour affichage
+                val lon = String.format("%.5f", location.longitude)
+                val accuracy = String.format("%.1f", location.accuracy)
                 Log.d("LocationService", "Nouvelle localisation: Lat=${location.latitude}, Lon=${location.longitude}")
+
+                // --- INTÉGRATION BASE DE DONNÉES ---
+                try {
+                    // Appel au Repository pour insérer la localisation dans la DB
+                    // Le Repository utilise withContext(Dispatchers.IO) pour exécuter sur le bon thread
+                    locationRepository.insertLocation(location)
+                    Log.d("LocationService", "Localisation insérée dans la base de données.")
+                } catch (e: Exception) {
+                    Log.e("LocationService", "Erreur lors de l'insertion en base de données: ${e.message}")
+                    // Gérer l'erreur d'insertion si nécessaire
+                }
+                // --- FIN INTÉGRATION BASE DE DONNÉES ---
 
                 // Mettre à jour la notification avec les nouvelles coordonnées
                 val updatedNotification = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
                     .setContentTitle("Suivi SmartTrip Actif")
-                    .setContentText("Localisation: $lat, $long")
+                    .setContentText("Dernier point @ $currentTime: $lat, $lon (±${accuracy}m)")
                     .setSmallIcon(R.drawable.ic_launcher_foreground) // icône de l'appli dans les notifications
                     .setOngoing(true)
                     .setContentIntent(getMainActivityPendingIntent())
@@ -111,8 +135,6 @@ class LocationService: Service() {
 
                 val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                 notificationManager.notify(NOTIFICATION_ID, updatedNotification)
-
-                // TODO: Ici, il faudra enregistrer la localisation dans la base de données Room
 
             }
             .launchIn(serviceScope) // Lance la collecte dans le scope du service
