@@ -112,7 +112,7 @@ class LocationService : Service() {
                 val accuracy = String.format("%.1f", location.accuracy) // Format avec 1 décimale de l'accuracy
                 Log.d("LocationService", "Nouvelle localisation: Lat=${location.latitude}, Lon=${location.longitude}")
 
-                // --- INTÉGRATION BASE DE DONNÉES ---
+                // INTÉGRATION BASE DE DONNÉES
                 try {
                     // Appel au Repository pour insérer la localisation dans la DB
                     // Le Repository utilise withContext(Dispatchers.IO) pour exécuter sur le bon thread
@@ -122,7 +122,7 @@ class LocationService : Service() {
                     Log.e("LocationService", "Erreur lors de l'insertion en base de données: ${e.message}")
                     // Gérer l'erreur d'insertion si nécessaire
                 }
-                // --- FIN INTÉGRATION BASE DE DONNÉES ---
+                // FIN INTÉGRATION BASE DE DONNÉES
 
                 // Mettre à jour la notification avec les nouvelles coordonnées
                 val updatedNotification = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
