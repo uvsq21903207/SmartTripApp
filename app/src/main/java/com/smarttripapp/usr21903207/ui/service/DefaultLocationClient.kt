@@ -15,9 +15,9 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.content.ContextCompat
 
-/**
- * Implémentation par défaut de LocationClient utilisant FusedLocationProviderClient.
- */
+
+ //Implémentation par défaut de LocationClient utilisant FusedLocationProviderClient.
+
 class DefaultLocationClient(
     private val context: Context,
     private val client: FusedLocationProviderClient // Injecté depuis le service
@@ -42,9 +42,7 @@ class DefaultLocationClient(
 
             // 3. Configurer la requête de localisation
             // Priorité équilibrée pour économiser la batterie tout en ayant une bonne précision
-            // Ajustez l'intervalle selon vos besoins. Un intervalle plus long économise plus de batterie.
             val request = LocationRequest.Builder(Priority.PRIORITY_BALANCED_POWER_ACCURACY, interval)
-                // .setWaitForAccurateLocation(false) // Peut être utile si la précision immédiate n'est pas critique
                 .setMinUpdateIntervalMillis(interval / 2) // Intervalle minimum
                 .build()
 
@@ -68,7 +66,6 @@ class DefaultLocationClient(
                     super.onLocationAvailability(availability)
                     if (!availability.isLocationAvailable) {
                         println("Localisation non disponible actuellement.")
-                        // Vous pourriez vouloir notifier l'utilisateur ou tenter de relancer plus tard
                     }
                 }
             }
@@ -91,9 +88,7 @@ class DefaultLocationClient(
         }
     }
 
-    /**
-     * Vérifie si les permissions de localisation nécessaires sont accordées.
-     */
+//Vérifie si les permissions de localisation nécessaires sont accordées.
     private fun hasLocationPermission(): Boolean {
         val fineLocationGranted = ContextCompat.checkSelfPermission(
             context,

@@ -6,13 +6,10 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "poi_points")
 data class PoiPoint(
     @PrimaryKey(autoGenerate = true)
-    val id: Long = 0,
-    val tripId: Long, // Pour lier le POI à un voyage spécifique
+    val id: Int = 0,
     val name: String,
-    val description: String,
-    val type: String, // Catégorie: Restaurant, Musée, Monument, etc.
+    val type: String,
     val latitude: Double,
     val longitude: Double,
-    val timestamp: Long,
-    val photoPath: String? = null // Chemin vers la photo
+    val timestamp: Long = System.currentTimeMillis()
 )

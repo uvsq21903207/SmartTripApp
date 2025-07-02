@@ -7,11 +7,11 @@ plugins {
 
 android {
     namespace = "com.smarttripapp.usr21903207"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.smarttripapp.usr21903207"
-        minSdk = 19
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"

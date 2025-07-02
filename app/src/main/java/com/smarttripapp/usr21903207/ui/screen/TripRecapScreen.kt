@@ -33,7 +33,7 @@ fun TripRecapScreen(navController: NavController, modifier: Modifier = Modifier)
         )
 
         Button(
-            onClick = { /* TODO: Implement trip data refresh */ },
+            onClick = { /* TODO: Implementer le raffraichissement  de la localisation*/ },
             modifier = Modifier.padding(bottom = 8.dp)
         ) {
             Text("Actualiser les données")
